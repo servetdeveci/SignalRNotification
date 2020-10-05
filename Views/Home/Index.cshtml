@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">SignalR</h1>
+    <p>SignalR Gelen Veriler</p> <button onclick="SendMessage()">Mesaj Gönder</button>
+    <div id="veriler" style="max-height:400px; overflow-y:auto"></div>
+</div>
+
+
+<script src="/lib/signalr/signalr.min.js"></script>
+
+
+<script type="text/javascript">
+    // Start the connection.
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl('/notifyHub')
+        .build();
+
+
+    connection.on('onChanged', function (message) {
+        var encodedMsg = message;
+        $("#veriler").prepend("<span> Message: " + message + "</span><br>")
+        // Add the message to the page.
+
+    });
+    // Transport fallback functionality is now built into start.
+    connection.start()
+        .then(function () {
+
+            console.log('connection started');
+            connection.invoke('SendMessage', 'invoke SendMessage' );
+        })
+        .catch(error => {
+            console.error(error.message);
+        });
+
+    function SendMessage() {
+        connection.invoke('SendMessage', 'invoke SendMessage');
+    }
+</script>
